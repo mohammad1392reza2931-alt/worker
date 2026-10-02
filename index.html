@@ -38,21 +38,42 @@ button{font:inherit;font-weight:700;font-size:16px;padding:15px 8px;border:1px s
 #er{color:#e66}
 #tt{position:fixed;left:50%;top:28%;transform:translateX(-50%);z-index:40;padding:16px 24px;border-radius:14px;font-size:20px;font-weight:700;text-align:center;max-width:90%;white-space:pre-line;display:none;color:#fff}
 #tt.ok{background:#1d5b3f}#tt.no{background:#7a1219}
+.hpz{}
+#lv{color:#e33;font-size:20px;letter-spacing:2px;text-shadow:0 0 6px #000}
+#jz{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:300;display:none;background:#000}
+#rot{position:fixed;inset:0;z-index:150;background:#000;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:22px;line-height:1.9}
+#rot b{display:block;font-size:64px}
+#ov{z-index:120}
+#menuNote{background:#2a1215;border:1px solid #5b2228;border-radius:10px;padding:10px 14px;margin:0 auto 16px;max-width:320px;line-height:1.8;font-size:15px}
+body.play #rot{display:none}
+@media (orientation:portrait){body.play #rot{display:flex}}
+body.play main{max-width:none;padding:0}
+body.play #wrap{position:fixed;inset:0;aspect-ratio:auto;border:0;z-index:5}
+body.play #c{object-fit:contain}
+body.play header{position:fixed;top:6px;left:8px;right:8px;z-index:6;pointer-events:none;margin:0;align-items:center}
+body.play header button{pointer-events:auto}
+body.play #fl{font-size:26px;text-shadow:0 0 6px #000}
+body.play #meta{text-shadow:0 0 4px #000;color:#9bb;font-size:11px}
+body.play #msg{display:none}
+body.play #pls{position:fixed;bottom:4px;left:0;right:0;text-align:center;z-index:6;pointer-events:none;font-size:11px;margin:0}
 </style>
 </head>
 <body>
 <main>
-<header><div id="fl">0</div><div id="meta"></div><button id="mu" style="padding:6px 10px;font-size:13px">صدا: روشن</button></header>
+<header><div id="fl">0</div><div id="meta"></div><div id="lv"></div><button id="mu" style="padding:6px 10px;font-size:13px">صدا: روشن</button></header>
 <div id="wrap"><canvas id="c"></canvas><div id="hint"></div><button id="pp"><span class="ky">E</span><span class="tx"><b id="pa"></b><small id="po"></small></span></button><div id="js"><div id="kn"></div></div></div>
 <div id="msg">چپ: جوی‌استیک حرکت. راست صفحه: بکش تا دوربین بچرخد. اگر چیزی عجیب دیدی به آسانسور اول برگرد و دکمه‌اش را بزن، وگرنه تا آسانسور آخر راهرو برو و دکمه‌اش را بزن.</div>
 <div id="pls" style="margin-top:8px;font-size:13px;color:var(--dim);line-height:1.8"></div>
 </main>
 <div id="menu"><div>
 <h2>طبقه‌های بیمارستان ۶۶۶</h2>
+<div id="menuNote">📱 لطفاً صفحه را به حالت افقی بچرخانید.<br>با زدن هر دکمه، بازی تمام‌صفحه می‌شود.</div>
 <div id="m0"><button id="bs">تک‌نفره</button><button id="bm">چندنفره</button></div>
 <div id="m1" hidden><button id="bh">میزبانی سرور</button><input id="ci" placeholder="کد" maxlength="5"><button id="bj">ورود با کد</button><button id="bk">بازگشت</button></div>
 <div id="m2" hidden><p>کد اتاق (به دوستت بده):</p><div id="cd"></div><p id="lc"></p><button id="bg" hidden>شروع بازی</button></div>
 <p id="er"></p></div></div>
+<canvas id="jz"></canvas>
+<div id="rot"><div><b>📱↻</b>لطفاً صفحه را به حالت افقی بچرخانید</div></div>
 <div id="tt"></div>
 <div id="ov"><div><h2 id="ot"></h2><p id="op"></p><button id="ob">ادامه</button></div></div>
 <script>
@@ -245,7 +266,7 @@ function build(){
  if(an===10)for(let i=0;i<14;i++)spr.push({k:"pr",x:i%2?10.9:8.1,y:62-i*3.2,z:.4+(i%3)*.1,f:i%2?1:-1});
  for(let i=0;i<(an===18?0:13);i++){const yy=5+i*4.8;spr.push({k:"lamp",x:9.5,y:yy,z:.95});if(i%2===0)spr.push({k:"vent",x:9.5,y:yy+1.4,z:.88})}
  spr.push({k:"iv",x:8.3,y:13},{k:"iv",x:10.7,y:25},{k:"iv",x:8.3,y:47},{k:"cart",x:8.35,y:19},{k:"cart",x:10.65,y:41},{k:"wc",x:10.6,y:44},{k:"wc",x:8.35,y:8},{k:"plant",x:8.3,y:52},{k:"plant",x:10.7,y:63});
- spr.push({k:"plant",x:5.7,y:37},{k:"wc",x:1.6,y:30},{k:"iv",x:2.4,y:34});if(an===19)spr=spr.filter(o=>o.k!=="plant");if(an===20)spr.push({k:"nurse",x:9,y:54});if(an===21)spr.push({k:"wc",x:9.5,y:30});if(an===23)spr.push({k:"pt",x:9.3,y:38},{k:"pt",x:9.9,y:24});{const dr=rng(ROOM+"d"+floor),T=["plant","wc","iv","cart","plant","wc"];for(let i=0;i<Math.min(8,floor/15|0);i++)spr.push({k:T[i%6],x:i%2?10.7:8.3,y:6+dr()*52})}spr.push({k:"pnl",x:10.9,y:67.7,z:.42},{k:"pnl",x:8.1,y:1.6,z:.42},{k:"lamp",x:9.5,y:68,z:.95},{k:"lamp",x:9.5,y:1.5,z:.95})}
+ spr.push({k:"plant",x:5.7,y:37},{k:"wc",x:1.6,y:30},{k:"iv",x:2.4,y:34});if(an===19)spr=spr.filter(o=>o.k!=="plant");if(an===20)spr.push({k:"nurse",x:9,y:54});if(an===21)spr.push({k:"wc",x:9.5,y:30});if(an===23)spr.push({k:"pt",x:9.3,y:38},{k:"pt",x:9.9,y:24});{const dr=rng(ROOM+"d"+floor),T=["plant","wc","iv","cart","plant","wc"];for(let i=0;i<Math.min(8,floor/15|0);i++)spr.push({k:T[i%6],x:i%2?10.7:8.3,y:6+dr()*52})}spr.push({k:"pnl",x:10.9,y:67.7,z:.42},{k:"pnl",x:8.1,y:1.6,z:.42},{k:"lamp",x:9.5,y:68,z:.95},{k:"lamp",x:9.5,y:1.5,z:.95});addHostiles()}
 // controls
 const jsEl=$("js"),kn=$("kn");
 function jm(e){const r=jsEl.getBoundingClientRect();let x=(e.clientX-r.left-55)/45,y=(e.clientY-r.top-55)/45;const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}jx=x;jy=y;kn.style.transform=`translate(${x*35}px,${y*35}px)`}
@@ -261,10 +282,10 @@ const CS=[[.22,.22],[-.22,.22],[.22,-.22],[-.22,-.22]];
 let last=0,flick=1;
 function loop(t){requestAnimationFrame(loop);const dt=Math.min(.05,(t-last)/1000);last=t;
  flick=(1+Math.sin(t*.0022)*.05+(R(500)===0?-.4:0)+(an!==null&&Math.random()<.012*(1-Math.min(1,floor/150))?-.5:0))*(1-.3*Math.min(1,floor/150));
- if(!busy&&!dl){const v=4.6*dt,fx=Math.cos(a),fy=Math.sin(a),rx=-Math.sin(a),ry=Math.cos(a),mx=(fx*-jy+rx*jx)*v,my=(fy*-jy+ry*jx)*v;
+ if(!busy&&!dl&&!jOn){const v=4.6*dt,fx=Math.cos(a),fy=Math.sin(a),rx=-Math.sin(a),ry=Math.cos(a),mx=(fx*-jy+rx*jx)*v,my=(fy*-jy+ry*jx)*v;
   if(!CS.some(([p,q])=>solid(px+mx+p,py+q))&&!hit(px+mx,py))px+=mx;if(!CS.some(([p,q])=>solid(px+p,py+my+q))&&!hit(px,py+my))py+=my}
- {const m=spr.find(o=>o.k==="man");if(m){m.y+=(an===24?5:1.3)*dt;if(m.y>60)m.y=8}}
- fxStep(dt);
+ {const m=spr.find(o=>o.k==="man");if(m&&!m.h){m.y+=1.3*dt;if(m.y>60)m.y=8}}
+ fxStep(dt);hostStep(dt);
  render();fxDraw(dt);
  $("hint").textContent=dl?"درِ آسانسور در حال باز شدن…":px<7?"داخل اتاق ۱۰۱ هستی":py<9?"همه‌چیز عادی بود؟ دکمهٔ آسانسور را بزن":py>60?"ناهنجاری دیدی؟ دکمهٔ آسانسور اول را بزن":(py>27&&py<40&&px>7?"درِ اتاق سمت چپ باز است":"")}
 // fx
@@ -299,7 +320,7 @@ function scare(kind){lastJ=performance.now();const k=kind==null?R(3):kind;jsc={t
 const AMB=[["whisper",6],["moan",4],["creak",5],["bang",14],["buzz",8],["heart",6],["glitch",10],["stinger",12]];
 function fxStep(dt){flick=Math.max(0,flick-dark);if(an===18)flick*=.3;nextAmb-=dt;if(dl){dT+=dt;if(dT>.8&&!dg){dg=1;snd("ding");shake(3)}dof=cl((dT-.8)/1.4,0,1);if(dT>2.3){dl=0;dof=0;for(let x=8;x<=10;x++)map[66][x]=0}}if(!busy&&py<65.5)armS=1;{const nm=(busy||dl)?0:py<7?1:(armS&&py>62.5?2:0);if(nm!==ppMode){ppMode=nm;pp.style.display=nm?"flex":"none";if(nm){$("pa").textContent=nm===1?"برو بالا":"برگرد";$("po").textContent=nm===1?"آسانسور آخر راهرو":"آسانسور اول"}}}
  if(nextAmb<=0&&!busy&&!jsc){nextAmb=5+Math.random()*9;const e=AMB[R(AMB.length)];snd(e[0]);shake(e[1]>7?e[1]:e[1]*.5);if(e[1]>7){dark=Math.max(dark,.4);vibe(e[1]*8)}}
- if(!trig&&(an===16||an===17)&&py<(an===16?38:30)){trig=1;scare(an===16?3:0)}
+ 
  const d=Math.hypot(px-lx,py-ly);lx=px;ly=py;if(!busy&&d<1){sa+=d;if(sa>1.2){sa=0;snd("step")}}}
 function fxDraw(dt){
  if(shk>.2){cv.style.transform=`translate(${(Math.random()-.5)*shk}px,${(Math.random()-.5)*shk}px) rotate(${(Math.random()-.5)*shk*.05}deg)`;shk*=Math.pow(.02,dt)}else{shk=0;cv.style.transform=""}
@@ -313,25 +334,76 @@ function fxDraw(dt){
 cv.style.transition="opacity .35s";const pp=$("pp");pp.onclick=()=>{if(ppMode&&!busy)answer(ppMode===2)};document.addEventListener("keydown",e=>{if((e.key==="e"||e.key==="E")&&ppMode&&!busy)answer(ppMode===2)});
 $("mu").onclick=()=>{muted=!muted;$("mu").textContent=muted?"صدا: خاموش":"صدا: روشن";if(mg)mg.gain.value=muted?0:.8;if(!muted)au()};
 document.addEventListener("pointerdown",au);
+
+// ===== lives, attackers, 10 jumpscares =====
+let lives=3,hT=0,jOn=0,jt=0,jk=0,jl=0,bag=[],lastSc=-1;
+const JZ=$("jz"),jx2=JZ.getContext("2d");
+function hud(){$("lv").textContent="❤".repeat(Math.max(0,lives))+"♡".repeat(Math.max(0,3-lives))}
+function nextSc(){if(!bag.length){bag=[0,1,2,3,4,5,6,7,8,9];for(let i=9;i>0;i--){const j=R(i+1);[bag[i],bag[j]]=[bag[j],bag[i]]}if(bag[bag.length-1]===lastSc){const j=R(bag.length-1);[bag[bag.length-1],bag[j]]=[bag[j],bag[bag.length-1]]}}lastSc=bag.pop();return lastSc}
+const SCS=[()=>{snd("scream");snd("bang")},()=>{snd("screech");snd("thud")},()=>{snd("scream");snd("glitch")},()=>{snd("stinger");snd("thud");snd("moan")},()=>{snd("bang");snd("screech")},()=>{snd("scream");snd("stinger")},()=>{snd("glitch");snd("whisper");snd("screech")},()=>{snd("moan");snd("scream")},()=>{snd("screech");snd("scream");snd("bang")},()=>{snd("stinger");snd("bang");snd("scream");snd("thud")}];
+function doScare(){const k=nextSc();jOn=1;jt=0;jk=k;jl=0;JZ.width=innerWidth;JZ.height=innerHeight;JZ.style.display="block";shake(30);vibe([80,40,160,40,300]);try{SCS[k]()}catch(e){}requestAnimationFrame(jzLoop)}
+function jzLoop(t){if(!jOn)return;const dt=Math.min(.05,(t-(jl||t))/1000);jl=t;jt+=dt;const p=jt/1.5;if(p>=1){jOn=0;jl=0;JZ.style.display="none";return}drawJ(jk,jx2,JZ.width,JZ.height,p,jt);requestAnimationFrame(jzLoop)}
+const JB=[["#200","#800"],["#000","#600"],["#011","#044"],["#000","#333"],["#100","#fff"],["#000","#400"],["#000","#300"],["#111","#555"],["#000","#222"],["#300","#f40"]];
+const E2=(c,x,y,rx,ry,f,rot)=>{c.fillStyle=f;c.beginPath();c.ellipse(x,y,Math.abs(rx),Math.abs(ry),rot||0,0,7);c.fill()};
+function fcs(c,r,a,b){const q=c.createRadialGradient(-r*.2,-r*.25,r*.1,0,0,r);q.addColorStop(0,a);q.addColorStop(1,b);E2(c,0,0,r*.78,r,q)}
+function eyeB(c,x,y,rx,ry,iris,look){E2(c,x,y,rx,ry,"#efe6d4");E2(c,x+look*rx*.3,y,rx*.5,Math.min(ry,rx*.5),iris);E2(c,x+look*rx*.3,y,rx*.1,ry*.8,"#000");c.strokeStyle="#a02020aa";c.lineWidth=2;for(let i=0;i<7;i++){c.beginPath();c.moveTo(x+rx*Math.cos(i*.9),y+ry*Math.sin(i*.9));c.lineTo(x+rx*.45*Math.cos(i*.9),y+ry*.45*Math.sin(i*.9));c.stroke()}}
+function teeth(c,x,y,w,n,len,col){c.fillStyle=col;for(let i=0;i<n;i++){const q=x-w/2+w*i/(n-1);c.beginPath();c.moveTo(q-w/n*.45,y);c.lineTo(q,y+len*(.7+.3*((i*7)%3)/2));c.lineTo(q+w/n*.45,y);c.fill()}}
+function drips(c,r,p){c.fillStyle="#7a0510";for(let i=0;i<16;i++){const x=(i/15-.5)*r*2.4,l=r*(.5+((i*37)%7)/7*1.2)*(.4+p*1.2);c.fillRect(x,-r*1.6,r*.07,r*1.6*.5+l);E2(c,x+r*.035,-r*1.6+r*.8+l,r*.05,r*.07,"#7a0510")}}
+function eyePath(c,w,hh){c.beginPath();c.moveTo(-w,0);c.quadraticCurveTo(0,-hh*2,w,0);c.quadraticCurveTo(0,hh*2,-w,0);c.closePath()}
+const JD=[
+ (c,r,t)=>{fcs(c,r,"#e8e2d8","#8a8078");const m=.45+.25*Math.abs(Math.sin(t*30));E2(c,-r*.28,-r*.28,r*.16,r*.22,"#000");E2(c,r*.28,-r*.28,r*.16,r*.22,"#000");E2(c,-r*.28,-r*.26,r*.03,r*.03,"#f00");E2(c,r*.28,-r*.26,r*.03,r*.03,"#f00");E2(c,0,r*.42,r*.3,r*m*.9,"#000");c.strokeStyle="#0008";c.lineWidth=2;for(let i=0;i<6;i++){c.beginPath();c.moveTo(-r*.5+i*r*.2,-r*.9);c.lineTo(-r*.4+i*r*.16,-r*.2+i*4);c.stroke()}},
+ (c,r,t,p)=>{const u=r*6.5,og=g;g=c;person(0,.84*u,u,"#dfe8e0","#2a1a14",true,false,true);g=og;drips(c,r,p);E2(c,0,r*.12,r*.2,r*.1*(1+Math.abs(Math.sin(t*25))),"#300")},
+ (c,r,t,p)=>{const u=r*6.5,og=g;g=c;person(0,.84*u,u,"#8fb0c0",null,true,false,false);g=og;c.fillStyle="#000";c.fillRect(-r*.25,r*.1,r*.5,r*.14*(1+Math.abs(Math.sin(t*20))*2))},
+ (c,r,t)=>{const q=c.createRadialGradient(0,0,r*.2,0,0,r*1.3);q.addColorStop(0,"#222");q.addColorStop(1,"#000");E2(c,0,0,r*1.3,r*1.5,q);E2(c,0,0,r*.8,r*1.05,"#000");c.shadowColor="#fff";c.shadowBlur=30;E2(c,-r*.28,-r*.12,r*.17,r*.07,"#fff",-.25);E2(c,r*.28,-r*.12,r*.17,r*.07,"#fff",.25);c.shadowBlur=0;c.fillStyle="#f4f4f4";c.beginPath();c.moveTo(-r*.55,r*.25);for(let i=0;i<=14;i++)c.lineTo(-r*.55+i*r*1.1/14,r*(.25+(i%2?.12:0)));for(let i=14;i>=0;i--)c.lineTo(-r*.55+i*r*1.1/14,r*(.55+(i%2?.12:0)+.1*Math.sin(t*20)));c.fill()},
+ (c,r,t)=>{const w=r*1.9,hh=r*(.75+.15*Math.sin(t*25));eyePath(c,w,hh);c.fillStyle="#eee0c8";c.fill();c.save();eyePath(c,w,hh);c.clip();c.strokeStyle="#b01818";c.lineWidth=3;for(let i=0;i<16;i++){const a=i*.4+.2;c.beginPath();c.moveTo(Math.cos(a)*w*1.1,Math.sin(a)*hh*1.2);c.lineTo(Math.cos(a)*r*.7,Math.sin(a)*r*.5);c.stroke()}const lx=Math.sin(t*9)*r*.1;E2(c,lx,0,r*.62,r*.62,"#8a1008");E2(c,lx,0,r*.5,r*.5,"#c01810");E2(c,lx,0,r*.12,r*.55,"#000");c.restore();eyePath(c,w,hh);c.strokeStyle="#200";c.lineWidth=r*.05;c.stroke()},
+ (c,r,t)=>{fcs(c,r,"#efe8d0","#9a9072");E2(c,-r*.3,-r*.15,r*.2,r*.25,"#000");E2(c,r*.3,-r*.15,r*.2,r*.25,"#000");E2(c,-r*.3,-r*.12,r*.04,r*.04,"#f22");E2(c,r*.3,-r*.12,r*.04,r*.04,"#f22");c.fillStyle="#000";c.beginPath();c.moveTo(0,r*.1);c.lineTo(-r*.08,r*.3);c.lineTo(r*.08,r*.3);c.fill();c.fillRect(-r*.4,r*.45,r*.8,r*.25*(1+.6*Math.abs(Math.sin(t*22))));c.fillStyle="#efe8d0";for(let i=0;i<8;i++)c.fillRect(-r*.4+i*r*.1,r*.45,r*.07,r*.12);c.strokeStyle="#0007";c.lineWidth=3;c.beginPath();c.moveTo(r*.1,-r*.9);c.lineTo(r*.2,-r*.5);c.lineTo(r*.05,-r*.35);c.stroke()},
+ (c,r,t)=>{for(let i=-3;i<=3;i++)for(let j=-2;j<=2;j++){const x=i*r*.62+((j&1)?r*.3:0),y=j*r*.5,o=Math.min(1,t*3-(Math.abs(i)+Math.abs(j))*.12);if(o<=0)continue;eyeB(c,x,y,r*.27*o,r*.14*o,"#b01010",Math.sin(t*5+i))}},
+ (c,r,t)=>{fcs(c,r,"#e9ddd0","#8d7f74");E2(c,-r*.3,-r*.3,r*.2,r*.14,"#fff");E2(c,r*.3,-r*.3,r*.2,r*.14,"#fff");E2(c,-r*.3,-r*.3,r*.035,r*.035,"#000");E2(c,r*.3,-r*.3,r*.035,r*.035,"#000");c.fillStyle="#200";c.beginPath();c.moveTo(-r*.78,r*.12);c.quadraticCurveTo(0,r*(.95+.05*Math.sin(t*14)),r*.78,r*.12);c.quadraticCurveTo(0,r*.35,-r*.78,r*.12);c.fill();c.fillStyle="#fffbe8";for(let i=0;i<=20;i++){const tt=i/20,x=(-.78+1.56*tt)*r,yt=((1-tt)**2*.12+2*(1-tt)*tt*.35+tt*tt*.12)*r;c.fillRect(x-r*.025,yt,r*.05,r*.1)}},
+ (c,r,t)=>{c.save();c.rotate(Math.PI);fcs(c,r,"#cfd2cc","#6f746c");c.restore();E2(c,-r*.26,r*.1,r*.15,r*.1,"#fff");E2(c,r*.26,r*.1,r*.15,r*.1,"#fff");E2(c,-r*.26+Math.sin(t*12)*r*.05,r*.1,r*.04,r*.04,"#000");E2(c,r*.26+Math.sin(t*12)*r*.05,r*.1,r*.04,r*.04,"#000");E2(c,0,-r*.45,r*.14,r*.3*(.6+.4*Math.abs(Math.sin(t*18))),"#100");c.strokeStyle="#050505";c.lineWidth=r*.04;for(let i=0;i<40;i++){const x=(i/39-.5)*r*2.6;c.beginPath();c.moveTo(x*.4,r*.75);c.quadraticCurveTo(x,r*1.3,x*1.1+Math.sin(t*6+i)*r*.03,r*2.4);c.stroke()}for(let i=0;i<10;i++){const x=(i/9-.5)*r*1.3;c.beginPath();c.moveTo(x,r*.3);c.quadraticCurveTo(x*1.4,r*.1,x*1.2,-r*.3+Math.sin(t*5+i)*r*.05);c.stroke()}},
+ (c,r,t)=>{fcs(c,r,"#a01010","#2a0000");c.fillStyle="#1a0505";[-1,1].forEach(s=>{c.beginPath();c.moveTo(s*r*.35,-r*.8);c.quadraticCurveTo(s*r*.9,-r*1.3,s*r*.7,-r*1.7);c.quadraticCurveTo(s*r*.55,-r*1.25,s*r*.12,-r*.7);c.fill()});[-1,1].forEach(s=>{E2(c,s*r*.3,-r*.2,r*.17,r*.1,"#ffd000",s*-.35);E2(c,s*r*.3,-r*.2,r*.03,r*.09,"#000");c.strokeStyle="#000";c.lineWidth=r*.06;c.beginPath();c.moveTo(s*r*.12,-r*.28);c.lineTo(s*r*.5,-r*.42);c.stroke()});const ry=r*(.18+.1*Math.abs(Math.sin(t*20)));E2(c,0,r*.4,r*.4,ry,"#000");teeth(c,0,r*.4-ry,r*.6,7,r*.2,"#fff");teeth(c,0,r*.4+ry,r*.6,7,-r*.18,"#fff")}
+];
+function drawJ(k,c,w,h,p,t){c.save();const sk=(1-p*.4)*10,S=1+p*.9,cx=w/2+(Math.random()-.5)*sk*2,cy=h/2+(Math.random()-.5)*sk*2;c.fillStyle=JB[k][Math.random()<.25?1:0];c.fillRect(0,0,w,h);c.translate(cx,cy);c.scale(S,S);JD[k](c,h*.46,t,p);c.restore();
+ if(Math.random()<.5){c.fillStyle="rgba(255,255,255,.07)";for(let i=0;i<40;i++)c.fillRect(Math.random()*w,Math.random()*h,w*.3*Math.random(),2)}
+ const vg=c.createRadialGradient(w/2,h/2,h*.3,w/2,h/2,w*.7);vg.addColorStop(0,"#0000");vg.addColorStop(1,"#000a");c.fillStyle=vg;c.fillRect(0,0,w,h);
+ if(p>.88){c.fillStyle="rgba(0,0,0,"+((p-.88)/.12)+")";c.fillRect(0,0,w,h)}}
+function addHostiles(){hT=0;const H1=(o,s)=>{o.h=1;o.sp=s};
+ if(an===15||an===16){const n=spr.find(o=>o.k==="nurse");if(n)H1(n,an===16?4.4:2.3)}
+ if(an===17){const o=spr.find(o=>o.k==="sh");if(o)H1(o,3.8)}
+ if(an===20)spr.filter(o=>o.k==="nurse").forEach(o=>H1(o,2.2));
+ if(an===23)spr.filter(o=>o.k==="pt"&&o.x>7).forEach(o=>H1(o,2.1));
+ if(an===24){const m=spr.find(o=>o.k==="man");if(m)H1(m,3.4)}}
+function hostStep(dt){if(busy||dl||jOn)return;hT+=dt;if(hT<2.5)return;
+ for(let i=0;i<spr.length;i++){const o=spr[i];if(!o.h)continue;if(!o.a){o.a=1;snd("whisper")}
+  let gx=px,gy=py;if(px<7.3&&o.x>7.3){gx=8.6;gy=cl(py,33,34.6)}
+  const dx=gx-o.x,dy=gy-o.y,d=Math.hypot(dx,dy)||1,s=o.sp*dt,nx=o.x+dx/d*s,ny=o.y+dy/d*s;
+  if(!solid(nx,o.y))o.x=nx;if(!solid(o.x,ny))o.y=ny;
+  if(Math.hypot(px-o.x,py-o.y)<.75){spr.splice(i,1);hurt();return}}}
+function hurt(){lives--;hud();if(lives<=0)punish("جان‌هایت تمام شد!");else{doScare();setTimeout(()=>toast(0,"✗ به تو حمله شد!\nجان باقی‌مانده: "+lives),1500)}}
+function punish(why){busy=true;cv.style.opacity=0;epoch++;floor=cp;if(lives<=0)lives=3;$("msg").textContent=why+" برگشتی به طبقه "+cp+".";doScare();setTimeout(()=>toast(0,"✗ "+why+"\nبه طبقه "+cp+" برگشتی"),1500);setTimeout(roll,4300)}
 // game
 function rng(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}let a=h>>>0;return()=>{a=a+1831565813|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function roll(){const rr=rng(ROOM+":"+floor+":"+epoch);an=rr()<.5?Math.floor(rr()*NAMES.length):null;sign=floor+(rr()<.5?1:-1)*(1+Math.floor(rr()*3));if(sign<0)sign=floor+2;px=9.5+((myId%4)-1.5)*.3;py=68.1;a=-Math.PI/2;pitch=0;$("fl").textContent=floor;$("meta").innerHTML=`ذخیره: ${cp}<br>بهترین: ${best}`;trig=0;armS=0;cv.style.opacity=1;dl=1;dT=0;dg=0;dof=0;for(let x=8;x<=10;x++)map[66][x]=7;build();busy=false;if(an!==null&&Math.random()<.9-.5*Math.min(1,floor/150))setTimeout(()=>{snd(["creak","whisper","glitch","moan"][R(4)]);shake(8)},1500+R(2500))}
-function newFloor(){if(floor>0&&floor%100===0){cp=floor;show("طبقه امن "+floor,"ذخیره شد. اگر اشتباه کنی به همین طبقه برمی‌گردی.","ادامه",roll);return}roll()}
+function roll(){const rr=rng(ROOM+":"+floor+":"+epoch);an=rr()<.5?Math.floor(rr()*NAMES.length):null;sign=floor+(rr()<.5?1:-1)*(1+Math.floor(rr()*3));if(sign<0)sign=floor+2;px=9.5+((myId%4)-1.5)*.3;py=68.1;a=-Math.PI/2;pitch=0;$("fl").textContent=floor;hud();$("meta").innerHTML=`ذخیره: ${cp}<br>بهترین: ${best}`;trig=0;armS=0;cv.style.opacity=1;dl=1;dT=0;dg=0;dof=0;for(let x=8;x<=10;x++)map[66][x]=7;build();busy=false;if(an!==null&&Math.random()<.9-.5*Math.min(1,floor/150))setTimeout(()=>{snd(["creak","whisper","glitch","moan"][R(4)]);shake(8)},1500+R(2500))}
+function newFloor(){if(floor>0&&floor%100===0){cp=floor;lives=3;show("طبقه امن "+floor,"ذخیره شد. اگر اشتباه کنی به همین طبقه برمی‌گردی.","ادامه",roll);return}roll()}
 function answer(saw){if(busy)return;busy=true;cv.style.opacity=0;const good=saw===(an!==null);
- if(good){floor++;best=Math.max(best,floor);if(floor>=GOAL){show("طبقه ۶۶۶","در آخر باز شد. هوای بیرون سرد است. فرار کردی.","دوباره",()=>{floor=0;cp=0;best=0;roll()});return}$("msg").textContent="درست بود. آسانسور بالا می‌رود.";toast(1,an!==null?"✓ درست! ناهنجاری بود: "+NAMES[an]:"✓ درست! راهرو عادی بود");snd("thud");shake(6);vibe(40);setTimeout(newFloor,1700)}
- else{const why=an!==null?"ناهنجاری بود: "+NAMES[an]+".":"راهرو عادی بود.";epoch++;floor=cp;$("msg").textContent="اشتباه. "+why+" برگشتی به طبقه "+cp+".";toast(0,"✗ اشتباه! "+why+"\nبه طبقه "+cp+" برگشتی");snd("bang");shake(12);vibe([60,30,60]);setTimeout(roll,2800)}}
+ if(good){floor++;best=Math.max(best,floor);if(floor>=GOAL){show("طبقه ۶۶۶","در آخر باز شد. هوای بیرون سرد است. فرار کردی.","دوباره",()=>{floor=0;cp=0;best=0;lives=3;roll()});return}$("msg").textContent="درست بود. آسانسور بالا می‌رود.";toast(1,an!==null?"✓ درست! ناهنجاری بود: "+NAMES[an]:"✓ درست! راهرو عادی بود");snd("thud");shake(6);vibe(40);setTimeout(newFloor,1700)}
+ else{const why=an!==null?"ناهنجاری بود: "+NAMES[an]+".":"راهرو عادی بود.";punish("اشتباه! "+why)}}
 function show(t,p,b,f){$("ot").textContent=t;$("op").textContent=p;$("ob").textContent=b;$("ov").style.display="flex";$("ob").onclick=()=>{$("ov").style.display="none";f()}}
 
 // menu + multiplayer
-const SERVER=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/ws";
+const WORKER_HOST="";// اگر آدرس ورکر را اینجا بنویسی (مثل workerino.name.workers.dev) دیگر سؤال نمی‌شود
+function srv(){let h=location.host,p=location.protocol==="https:"?"wss://":"ws://";
+ if(!/workers\.dev$|^localhost|^127\./.test(location.hostname)){h=WORKER_HOST;try{if(!h)h=localStorage.getItem("wk")||""}catch(e){}
+  if(!h){h=(prompt("آدرس ورکر Cloudflare را بنویس (مثال: workerino.xxx.workers.dev)")||"").trim().replace(/^(https?|wss?):\/\//,"").replace(/\/.*$/,"");if(h)try{localStorage.setItem("wk",h)}catch(e){}}
+  p="wss://"}
+ return h?p+h+"/ws":null}
 const others=new Map();let ws=null,started=false,isHost=false,opened=false;
 const myName=(()=>{try{let n=localStorage.getItem("nm");if(!n){n=(prompt("اسمت چیه؟")||"").trim().slice(0,12)||"بازیکن"+R(99);localStorage.setItem("nm",n)}return n}catch(e){return"بازیکن"+R(99)}})();
 function toast(ok,s){const e=$("tt");e.className=ok?"ok":"no";e.textContent=s;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",ok?1500:2600)}
 function pane(n){["m0","m1","m2"].forEach((k,i)=>$(k).hidden=i!==n)}
-function begin(room){ROOM=room;floor=0;cp=0;best=0;epoch=0;started=true;$("menu").style.display="none";roll()}
+function begin(room){ROOM=room;lives=3;floor=0;cp=0;best=0;epoch=0;started=true;$("menu").style.display="none";document.body.classList.add("play");roll()}
 function ghostList(){const r=[];others.forEach(o=>{if(!started||o.f!==floor)return;o.x+=(o.tx-o.x)*.3;o.y+=(o.ty-o.y)*.3;r.push(o)});return r}
 function hudPl(){const n=Date.now(),l=[];others.forEach((o,id)=>{if(n-o.ts>5000)others.delete(id);else l.push(o.n+": طبقه "+o.f)});$("pls").textContent=started&&ws&&ws.readyState===1?"اتاق "+ROOM+" — "+(l.length?l.join(" | "):"هم‌تیمی‌ها در طبقهٔ دیگرند یا هنوز حرکت نکرده‌اند"):""}
-function conn(){opened=false;$("er").textContent="";try{ws=new WebSocket(SERVER+"?room="+encodeURIComponent(ROOM)+"&name="+encodeURIComponent(myName)+"&host="+(isHost?1:0))}catch(e){return}
+function conn(){opened=false;$("er").textContent="";const sv=srv();if(!sv){pane(isHost?0:1);$("er").textContent="آدرس سرور لازم است";return}try{ws=new WebSocket(sv+"?room="+encodeURIComponent(ROOM)+"&name="+encodeURIComponent(myName)+"&host="+(isHost?1:0))}catch(e){return}
  ws.onopen=()=>{opened=true;$("cd").textContent=ROOM;pane(2)};
  ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
   if(m.t==="w")myId=m.id;
@@ -339,7 +411,7 @@ function conn(){opened=false;$("er").textContent="";try{ws=new WebSocket(SERVER+
   else if(m.t==="go"&&!started)begin(ROOM);
   else if(m.t==="s"){let o=others.get(m.id);if(!o){o={k:"pl",x:m.x,y:m.y,tx:m.x,ty:m.y};others.set(m.id,o)}o.tx=m.x;o.ty=m.y;o.f=m.f;o.n=m.n;o.ts=Date.now()}
   else if(m.t==="l")others.delete(m.id)};
- ws.onclose=()=>{others.clear();if(!opened){$("er").textContent="کد اشتباه است یا سرور در دسترس نیست";pane(isHost?0:1)}else if(started)setTimeout(conn,3000)}}
+ ws.onclose=()=>{others.clear();if(!opened){$("er").textContent="کد اشتباه است یا سرور در دسترس نیست";if(isHost)try{localStorage.removeItem("wk")}catch(e){}pane(isHost?0:1)}else if(started)setTimeout(conn,3000)}}
 $("bs").onclick=()=>{myId=0;begin(String(Math.random()))};
 $("bm").onclick=()=>pane(1);$("bk").onclick=()=>{$("er").textContent="";pane(0)};
 $("bh").onclick=()=>{isHost=true;const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<5;i++)s+=c[R(c.length)];ROOM=s;conn()};
@@ -347,6 +419,8 @@ $("bj").onclick=()=>{const c=$("ci").value.trim().toUpperCase();if(c.length<3){$
 $("bg").onclick=()=>{if(ws&&ws.readyState===1)ws.send('{"t":"go"}')};
 setInterval(()=>{if(started&&ws&&ws.readyState===1)ws.send(JSON.stringify({t:"s",x:+px.toFixed(2),y:+py.toFixed(2),f:floor}))},100);
 setInterval(hudPl,1000);
+function goFS(){try{const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;if(f){const p=f.call(e);if(p&&p.then)p.then(()=>{try{screen.orientation.lock("landscape").catch(()=>{})}catch(x){}}).catch(()=>{})}}catch(x){}}
+document.querySelectorAll("#menu button").forEach(b=>b.addEventListener("click",goFS));
 roll();requestAnimationFrame(loop);
 </script>
 </body>
