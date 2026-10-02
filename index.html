@@ -37,12 +37,12 @@ button{font:inherit;font-weight:700;font-size:16px;padding:15px 8px;border:1px s
 <header><div id="fl">0</div><div id="meta"></div><button id="mu" style="padding:6px 10px;font-size:13px">صدا: روشن</button></header>
 <div id="wrap"><canvas id="c"></canvas><div id="hint"></div><button id="pp"><span class="ky">E</span><span class="tx"><b id="pa"></b><small id="po"></small></span></button><div id="js"><div id="kn"></div></div></div>
 <div id="msg">چپ: جوی‌استیک حرکت. راست صفحه: بکش تا دوربین بچرخد. اگر چیزی عجیب دیدی به آسانسور اول برگرد و دکمه‌اش را بزن، وگرنه تا آسانسور آخر راهرو برو و دکمه‌اش را بزن.</div>
-
+<div id="pls" style="margin-top:8px;font-size:13px;color:var(--dim);line-height:1.8"></div>
 </main>
 <div id="ov"><div><h2 id="ot"></h2><p id="op"></p><button id="ob">ادامه</button></div></div>
 <script>
-const GOAL=666,$=id=>document.getElementById(id),R=n=>Math.floor(Math.random()*n);
-let floor=0,cp=0,best=0,an=null,sign=0,busy=false;
+const ROOM=(new URLSearchParams(location.search).get("room")||"main").slice(0,24),GOAL=666,$=id=>document.getElementById(id),R=n=>Math.floor(Math.random()*n);
+let epoch=0,floor=0,cp=0,best=0,an=null,sign=0,busy=false;
 const NAMES=["عدد تابلو با طبقه فرق دارد","۶۶۶ روی تابلو","چراغ‌های قرمز","خون روی زمین","سایه‌ای انتهای راهرو","درها ناپدید شده‌اند","تابلو وارونه است","چشم‌هایی روی سقف","آسانسور تاریک باز است","زمین وجود ندارد","جای دست روی دیوار","متن تابلو آینه‌ای است","تخت وسط راهرو است","تخت غایب است","پرستار ناپدید شده","پرستار وسط راهرو ایستاده","پرستار ناگهان به طرفت می‌پرد","هیولای سیاه ناگهان ظاهر می‌شود","چراغ‌ها خاموش‌اند","گلدان‌ها ناپدید شده‌اند","دو پرستار در راهرو","ویلچر وسط راهرو است","کیسه‌های سرم خونی‌اند","بیمار وسط راهرو ایستاده","مرد رهگذر می‌دود","تابلو علامت سؤال دارد"];
 const cv=$("c"),G=cv.getContext("2d"),W=480,H=360;let g=G;cv.width=W;cv.height=H;
 // map
@@ -170,7 +170,7 @@ const pl=lv(bake(160,256,()=>drawPlant(80,250,300)));
 const VT={nurse:per("#dfe8e0","#2a1a14",false,true,false,true),nurse2:per("#9fc0c8","#c9b98a",false,true,false,true),pt:per("#8fb0c0",null,true,false),sh:per("#000",null,false,false,true)};
 const VF={nurse:[0,1,.17],nurse2:[1,0,.17],pt:[1,0,.17],sh:[0,1,.17],man:[0,1,.17]},VS={nurse:.55/230,nurse2:.55/230,pt:.55/230,sh:.6/230,man:.58/230};
 const manT=(back)=>lv(bake(160,256,()=>{person(80,240,230,"#e8ece8","#1a1a1a",false,false,false);g.fillStyle="#111";g.fillRect(80-.14*230,240-.42*230,.28*230,.14*230);if(back){g.fillStyle="#1a1a1a";g.beginPath();g.ellipse(80,240-.84*230,.108*230,.128*230,0,0,7);g.fill()}const bx=back?80-.215*230:80+.215*230;g.fillStyle="#3b2a1e";g.fillRect(bx-.08*230,240-.32*230,.16*230,.12*230);g.strokeStyle="#1c120b";g.lineWidth=2;g.strokeRect(bx-.08*230,240-.32*230,.16*230,.12*230);g.beginPath();g.moveTo(bx-.03*230,240-.32*230);g.lineTo(bx-.03*230,240-.35*230);g.lineTo(bx+.03*230,240-.35*230);g.lineTo(bx+.03*230,240-.32*230);g.stroke()}));
-VT.man=[manT(false),manT(true)];
+VT.man=[manT(false),manT(true)];VT.pl=VT.pt;VF.pl=VF.pt;VS.pl=VS.pt;
 const BL=[[9.3,36,.55,.32],[9.75,59,.45,.28],[9.1,36.4,.2,.12],[9.9,35.6,.15,.1],[9.5,59.4,.14,.09]];
 function drawVol(o,hz){const F=VF[o.k],dx=o.x-px,dy=o.y-py,dX=Math.cos(a),dY=Math.sin(a),pX=-Math.sin(a)*.66,pY=Math.cos(a)*.66,inv=1/(pX*dY-dX*pY),tY=inv*(-pY*dx+pX*dy),tX=inv*(dY*dx-dX*dy);if(tY<.2)return;
  const lh=H/tY*.9,s=lh*VS[o.k],fy=hz+lh*.5,fb=240,sx=W/2*(1+tX/tY),hw=80*s,front=(px-o.x)*F[0]+(py-o.y)*F[1]>0,tex=VT[o.k][front?0:1],kk=cl(1.3-tY/17,0,1)*flick,li=cl(((1-kk)*8)|0,0,7);
@@ -217,7 +217,7 @@ function render(){
   if(h.t===2&&an===8){g.fillStyle="#000";g.fillRect(c,top+lh*.1,1.3,lh*.9)}
   const k=cl(1.3-h.d/17,0,1)*(h.side?.8:1)*flick;g.fillStyle=`rgba(0,0,0,${cl(1-k,0,1)})`;g.fillRect(c,top,1.3,lh)}
  if(an===2){g.globalCompositeOperation="multiply";g.fillStyle="#ff4040";g.fillRect(0,0,W,H);g.globalCompositeOperation="source-over"}
- const list=spr.map(o=>({o,d:(o.x-px)**2+(o.y-py)**2})).sort((p,q)=>q.d-p.d);list.forEach(s=>VT[s.o.k]?drawVol(s.o,hz):BX[s.o.k]?drawBox(s.o,hz):drawSpr(s.o,hz));
+ const list=spr.concat(ghostList()).map(o=>({o,d:(o.x-px)**2+(o.y-py)**2})).sort((p,q)=>q.d-p.d);list.forEach(s=>VT[s.o.k]?drawVol(s.o,hz):BX[s.o.k]?drawBox(s.o,hz):drawSpr(s.o,hz));
  sgnTxt(9.5,1.35,an===25?"???":an===0?sign:an===1?666:floor,hz,an);sgnTxt(9.5,68.5,floor,hz,0);
  const vg=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.7);vg.addColorStop(0,"#0000");vg.addColorStop(1,"#000b");g.fillStyle=vg;g.fillRect(0,0,W,H)}
 function build(){
@@ -299,13 +299,27 @@ cv.style.transition="opacity .35s";const pp=$("pp");pp.onclick=()=>{if(ppMode&&!
 $("mu").onclick=()=>{muted=!muted;$("mu").textContent=muted?"صدا: خاموش":"صدا: روشن";if(mg)mg.gain.value=muted?0:.8;if(!muted)au()};
 document.addEventListener("pointerdown",au);
 // game
-function roll(){an=Math.random()<.5?R(NAMES.length):null;sign=floor+(R(2)?1:-1)*(1+R(3));if(sign<0)sign=floor+2;px=9.5;py=68.1;a=-Math.PI/2;pitch=0;$("fl").textContent=floor;$("meta").innerHTML=`ذخیره: ${cp}<br>بهترین: ${best}`;trig=0;armS=0;cv.style.opacity=1;dl=1;dT=0;dg=0;dof=0;for(let x=8;x<=10;x++)map[66][x]=7;build();busy=false;if(an!==null&&Math.random()<.5)setTimeout(()=>{snd(["creak","whisper","glitch","moan"][R(4)]);shake(8)},1500+R(2500))}
+function rng(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}let a=h>>>0;return()=>{a=a+1831565813|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function roll(){const rr=rng(ROOM+":"+floor+":"+epoch);an=rr()<.5?Math.floor(rr()*NAMES.length):null;sign=floor+(rr()<.5?1:-1)*(1+Math.floor(rr()*3));if(sign<0)sign=floor+2;px=9.5;py=68.1;a=-Math.PI/2;pitch=0;$("fl").textContent=floor;$("meta").innerHTML=`ذخیره: ${cp}<br>بهترین: ${best}`;trig=0;armS=0;cv.style.opacity=1;dl=1;dT=0;dg=0;dof=0;for(let x=8;x<=10;x++)map[66][x]=7;build();busy=false;if(an!==null&&Math.random()<.5)setTimeout(()=>{snd(["creak","whisper","glitch","moan"][R(4)]);shake(8)},1500+R(2500))}
 function newFloor(){if(floor>0&&floor%100===0){cp=floor;show("طبقه امن "+floor,"ذخیره شد. اگر اشتباه کنی به همین طبقه برمی‌گردی.","ادامه",roll);return}roll()}
 function answer(saw){if(busy)return;busy=true;cv.style.opacity=0;const good=saw===(an!==null);
  if(good){floor++;best=Math.max(best,floor);if(floor>=GOAL){show("طبقه ۶۶۶","در آخر باز شد. هوای بیرون سرد است. فرار کردی.","دوباره",()=>{floor=0;cp=0;best=0;roll()});return}$("msg").textContent="درست بود. آسانسور بالا می‌رود.";snd("thud");shake(6);vibe(40);setTimeout(newFloor,600)}
- else{const why=an!==null?"ناهنجاری بود: "+NAMES[an]+".":"راهرو عادی بود.";floor=cp;$("msg").textContent="اشتباه. "+why+" برگشتی به طبقه "+cp+".";snd("bang");shake(12);vibe([60,30,60]);setTimeout(roll,1800)}}
+ else{const why=an!==null?"ناهنجاری بود: "+NAMES[an]+".":"راهرو عادی بود.";epoch++;floor=cp;$("msg").textContent="اشتباه. "+why+" برگشتی به طبقه "+cp+".";snd("bang");shake(12);vibe([60,30,60]);setTimeout(roll,1800)}}
 function show(t,p,b,f){$("ot").textContent=t;$("op").textContent=p;$("ob").textContent=b;$("ov").style.display="flex";$("ob").onclick=()=>{$("ov").style.display="none";f()}}
 
+// multiplayer
+const SERVER=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/ws";
+const others=new Map();let ws=null;
+const myName=(()=>{try{let n=localStorage.getItem("nm");if(!n){n=(prompt("اسمت چیه؟")||"").trim().slice(0,12)||"بازیکن"+R(99);localStorage.setItem("nm",n)}return n}catch(e){return"بازیکن"+R(99)}})();
+function ghostList(){const r=[];others.forEach(o=>{if(o.f!==floor||o.e!==epoch)return;o.x+=(o.tx-o.x)*.3;o.y+=(o.ty-o.y)*.3;r.push(o)});return r}
+function hudPl(){const n=Date.now(),l=[];others.forEach((o,id)=>{if(n-o.ts>5000)others.delete(id);else l.push(o.n+": طبقه "+o.f)});$("pls").textContent=ws&&ws.readyState===1?"اتاق «"+ROOM+"» — "+(l.length?l.join(" | "):"تنها هستی؛ لینک را برای دوستت بفرست"):"آفلاین (تک‌نفره)"}
+function conn(){try{ws=new WebSocket(SERVER+"?room="+encodeURIComponent(ROOM)+"&name="+encodeURIComponent(myName))}catch(e){return}
+ ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
+  if(m.t==="s"){let o=others.get(m.id);if(!o){o={k:"pl",x:m.x,y:m.y,tx:m.x,ty:m.y};others.set(m.id,o)}o.tx=m.x;o.ty=m.y;o.f=m.f;o.e=m.e;o.n=m.n;o.ts=Date.now()}
+  else if(m.t==="l")others.delete(m.id)};
+ ws.onclose=()=>{others.clear();setTimeout(conn,3000)}}
+setInterval(()=>{if(ws&&ws.readyState===1)ws.send(JSON.stringify({t:"s",x:+px.toFixed(2),y:+py.toFixed(2),f:floor,e:epoch}))},100);
+setInterval(hudPl,1000);conn();
 roll();requestAnimationFrame(loop);
 </script>
 </body>
