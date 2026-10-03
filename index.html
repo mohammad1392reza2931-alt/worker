@@ -455,21 +455,30 @@ function pane(n){["m0","m1","m2","m3"].forEach((k,i)=>$(k).hidden=i!==n)}
 function begin(room){dead=false;ROOM=room;lives=3;floor=0;cp=0;best=0;epoch=0;started=true;$("menu").style.display="none";document.body.classList.add("play");roll()}
 function ghostList(){const r=[];others.forEach(o=>{if(!started||o.f!==floor)return;o.x+=(o.tx-o.x)*.3;o.y+=(o.ty-o.y)*.3;r.push(o)});return r}
 function hudPl(){const n=Date.now(),l=[];others.forEach((o,id)=>{if(n-o.ts>5000)others.delete(id);else l.push((o.dead?"☠ ":"")+o.n+": طبقه "+o.f)});$("pls").textContent=started&&ws&&ws.readyState===1?"اتاق "+ROOM+" — "+(l.length?l.join(" | "):"هم‌تیمی‌ات وصل نیست یا هنوز حرکت نکرده"):(started&&ws?"⚠ ارتباط با سرور قطع شد؛ در حال اتصال دوباره…":"")}
-function conn(){opened=false;$("er").textContent="";const sv=srv();if(!sv){pane(isHost?0:1);$("er").textContent="آدرس سرور لازم است";return}try{ws=new WebSocket(sv+"?room="+encodeURIComponent(ROOM)+"&name="+encodeURIComponent(myName)+"&host="+(isHost?1:0)+"&rs="+(started?1:0))}catch(e){return}
- ws.onopen=()=>{opened=true;$("cd").textContent=ROOM;pane(2);if(dead)try{ws.send('{"t":"dead"}')}catch(e){}};
- ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
-  if(m.t==="w")myId=m.id;
+let joined=false,retry=0,lastRx=0;const CID=Math.random().toString(36).slice(2,10);
+function reconnect(){if(!joined)return;const o=ws;if(o){o.onclose=null;o.onmessage=null;o.onopen=null;try{o.close()}catch(e){}}conn()}
+function conn(){opened=false;$("er").textContent="";const sv=srv();if(!sv){joined=false;pane(isHost?0:1);$("er").textContent="آدرس سرور لازم است";return}let me;try{me=ws=new WebSocket(sv+"?room="+encodeURIComponent(ROOM)+"&name="+encodeURIComponent(myName)+"&host="+(isHost?1:0)+"&rs="+(started?1:0)+"&cid="+CID)}catch(e){return}
+ me.onopen=()=>{if(ws!==me)return;opened=true;joined=true;retry=0;lastRx=Date.now();$("cd").textContent=ROOM;pane(2);if(dead)try{ws.send('{"t":"dead"}')}catch(e){}};
+ me.onmessage=ev=>{if(ws!==me)return;lastRx=Date.now();let m;try{m=JSON.parse(ev.data)}catch(e){return}
+  if(m.t==="w"){myId=m.id;if(m.host!=null)isHost=!!m.host}
+  else if(m.t==="p"){}
   else if(m.t==="c"&&!started){$("lc").textContent=isHost?(m.n<2?"منتظر ورود دوستت… ("+m.n+" نفر در اتاق)":m.n+" نفر در اتاق‌اند. هر وقت آماده بودید شروع کن."):"منتظر شروع بازی توسط میزبان… ("+m.n+" نفر)";$("bg").hidden=!(isHost&&m.n>=2)}
   else if(m.t==="go"&&!started)begin(ROOM);
   else if(m.t==="st")applySt(m);
   else if(m.t==="s"){let o=others.get(m.id);if(!o){o={k:"pl",x:m.x,y:m.y,tx:m.x,ty:m.y};others.set(m.id,o)}o.tx=m.x;o.ty=m.y;o.f=m.f;o.n=m.n;o.dead=!!m.d;o.ts=Date.now()}
   else if(m.t==="l")others.delete(m.id)};
- ws.onclose=()=>{others.clear();if(started){setTimeout(conn,2000);return}if(!opened){$("er").textContent="کد اشتباه است یا سرور در دسترس نیست";pane(isHost?0:1)}}}
+ me.onclose=()=>{if(ws!==me)return;others.clear();
+  if(started){setTimeout(()=>{if(ws===me)conn()},2000);return}
+  if(joined&&retry<8){retry++;$("lc").textContent="ارتباط قطع شد؛ در حال اتصال دوباره…";$("bg").hidden=true;setTimeout(()=>{if(!started&&ws===me)conn()},1500);return}
+  joined=false;$("er").textContent="کد اشتباه است یا سرور در دسترس نیست";pane(isHost?0:1)}}
 $("bs").onclick=()=>{myId=0;begin(String(Math.random()))};
 $("bm").onclick=()=>pane(1);$("bk").onclick=()=>{$("er").textContent="";pane(0)};
-$("bh").onclick=()=>{isHost=true;const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<5;i++)s+=c[R(c.length)];ROOM=s;conn()};
-$("bj").onclick=()=>{const c=$("ci").value.trim().toUpperCase();if(c.length<3){$("er").textContent="کد را وارد کن";return}isHost=false;ROOM=c;conn()};
-$("bg").onclick=()=>{if(ws&&ws.readyState===1)ws.send('{"t":"go"}')};
+$("bh").onclick=()=>{isHost=true;joined=false;retry=0;const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<5;i++)s+=c[R(c.length)];ROOM=s;conn()};
+$("bj").onclick=()=>{const c=$("ci").value.trim().toUpperCase();if(c.length<3){$("er").textContent="کد را وارد کن";return}isHost=false;joined=false;retry=0;ROOM=c;conn()};
+$("bg").onclick=()=>{if(ws&&ws.readyState===1)ws.send('{"t":"go"}');else reconnect()};
+// heartbeat: keeps the socket alive, and detects "zombie" connections (phone slept / network switched) so we reconnect
+setInterval(()=>{if(!joined||!ws)return;if(ws.readyState===1){if(Date.now()-lastRx>12000){reconnect();return}try{ws.send('{"t":"ping"}')}catch(e){}}},4000);
+document.addEventListener("visibilitychange",()=>{if(document.hidden||!joined)return;if(!ws||ws.readyState>1||(ws.readyState===1&&Date.now()-lastRx>5000))reconnect()});
 setInterval(()=>{if(started&&ws&&ws.readyState===1)ws.send(JSON.stringify({t:"s",x:+px.toFixed(2),y:+py.toFixed(2),f:floor,e:epoch,c:cp,b:best}))},100);
 setInterval(hudPl,1000);
 function goFS(){try{const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;if(f){const p=f.call(e);if(p&&p.then)p.then(()=>{try{screen.orientation.lock("landscape").catch(()=>{})}catch(x){}}).catch(()=>{})}}catch(x){}}
