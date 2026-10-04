@@ -83,7 +83,7 @@ body.play #pls{position:fixed;bottom:4px;left:0;right:0;text-align:center;z-inde
 <div id="m0"><button id="bs">تک‌نفره</button><button id="bm">چندنفره</button></div>
 <div id="m1" hidden><button id="bh">میزبانی سرور</button><input id="ci" placeholder="کد" maxlength="5"><button id="bj">ورود با کد</button><button id="bk">بازگشت</button></div>
 <div id="m2" hidden><p>کد اتاق (به دوستت بده):</p><div id="cd"></div><p id="lc"></p><p id="dg" style="font-size:12px;color:#7d9088;margin:4px 0"></p><button id="bg" hidden>شروع بازی</button></div>
-<p id="er"></p><div style="font-size:11px;color:#556;margin-top:10px">نسخهٔ ۶</div></div></div>
+<p id="er"></p><div style="font-size:11px;color:#556;margin-top:10px">نسخهٔ ۷</div></div></div>
 <div id="sub"></div>
 <div id="dd"><div><b>☠ مُردی</b>اگر هم‌تیمی‌ات آسانسور را درست بزند،<br>از طبقهٔ بعد با جان کامل زنده می‌شوی</div></div>
 <canvas id="jz"></canvas>
@@ -464,7 +464,7 @@ function conn(){opened=false;$("er").textContent="در حال اتصال به س
  me.onopen=()=>{if(ws!==me)return;$("er").textContent="";opened=true;joined=true;retry=0;lastRx=Date.now();$("cd").textContent=ROOM;pane(2);if(dead)try{ws.send('{"t":"dead"}')}catch(e){}};
  me.onmessage=ev=>{if(ws!==me)return;lastRx=Date.now();let m;try{m=JSON.parse(ev.data)}catch(e){return}
   if(m.t==="w"){myId=m.id;if(m.host!=null){isHost=!!m.host;if(!isHost)$("bg").hidden=true}}
-  else if(m.t==="r"){roster=m.l||[];if(!started)$("dg").textContent="پینگ: "+rtt+" ms | "+rosterTxt()}
+  else if(m.t==="r"){roster=m.l||[];if(!started)$("dg").textContent=(isHost?"👑 تو میزبانی | ":"")+"پینگ: "+rtt+" ms | "+rosterTxt()}
   else if(m.t==="p"){if(m.ts)rtt=Date.now()-m.ts;if(!started)$("dg").textContent="پینگ: "+rtt+" ms"}
   else if(m.t==="c"&&!started){$("lc").textContent=isHost?(m.n<2?"منتظر ورود دوستت… ("+m.n+" نفر در اتاق)":m.n+" نفر در اتاق‌اند. هر وقت آماده بودید شروع کن."):"منتظر شروع بازی توسط میزبان… ("+m.n+" نفر)";$("bg").hidden=!(isHost&&m.n>=2)}
   else if(m.t==="go"&&!started)begin(ROOM);
@@ -479,7 +479,7 @@ $("bs").onclick=()=>{myId=0;begin(String(Math.random()))};
 $("bm").onclick=()=>pane(1);$("bk").onclick=()=>{$("er").textContent="";pane(0)};
 $("bh").onclick=()=>{isHost=true;joined=false;retry=0;const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<5;i++)s+=c[R(c.length)];ROOM=s;conn()};
 $("bj").onclick=()=>{const c=$("ci").value.trim().toUpperCase();if(c.length<3){$("er").textContent="کد را وارد کن";return}isHost=false;joined=false;retry=0;ROOM=c;conn()};
-$("bg").onclick=()=>{clearInterval(goT);let n=0;const f=()=>{if(started||++n>8){clearInterval(goT);return}if(ws&&ws.readyState===1)ws.send('{"t":"go"}');else reconnect()};f();goT=setInterval(f,1500)};
+$("bg").onclick=()=>{clearInterval(goT);let n=0;$("lc").textContent="درخواست شروع فرستاده شد… منتظر پاسخ سرور";const f=()=>{if(started){clearInterval(goT);return}if(++n>10){clearInterval(goT);$("lc").textContent="⚠ سرور جواب نداد؛ اینترنت را بررسی کن و دوباره دکمه را بزن";return}if(ws&&ws.readyState===1)ws.send('{"t":"go"}');else{$("lc").textContent="اتصال قطع است؛ در حال اتصال دوباره…";reconnect()}};f();goT=setInterval(f,1500)};
 // heartbeat: keeps the socket alive, and detects "zombie" connections (phone slept / network switched) so we reconnect
 setInterval(()=>{if(!joined||!ws)return;if(ws.readyState===1){if(Date.now()-lastRx>10000){reconnect();return}try{ws.send('{"t":"ping","ts":'+Date.now()+'}')}catch(e){}}},3000);
 document.addEventListener("visibilitychange",()=>{if(document.hidden||!joined)return;if(!ws||ws.readyState>1||(ws.readyState===1&&Date.now()-lastRx>5000))reconnect()});
